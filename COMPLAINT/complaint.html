@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Complaint Form</title>
+  
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #dde8d7, #d9e5d1);
+    }
+
+    .complaint-section {
+      width: 100%;
+      height: 100vh;
+      padding: 40px;
+      box-sizing: border-box;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .complaint-section h2 {
+      color: #b674ec;
+      text-align: left;
+      margin: 0 0 30px 0;
+      font-size: 32px;
+    }
+
+    .complaint-form {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .complaint-form label {
+      margin-top: 16px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .complaint-form input,
+    .complaint-form select,
+    .complaint-form textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+      transition: 0.2s;
+    }
+
+    .complaint-form input:focus,
+    .complaint-form select:focus,
+    .complaint-form textarea:focus {
+      border-color: #ccc;
+      outline: none;
+    }
+
+    .complaint-form button {
+      margin-top: 24px;
+      background: #b674ec;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .complaint-form button:hover {
+      background: #8c4ecb;
+    }
+    .back-container {
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  background-color: #b674ec;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  background-color: #8c4ecb;
+}
+  </style>
+</head>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+
+
+
+
+<body>
+  <div class="complaint-section">
+    <div class="back-container">
+  <button onclick="goBack()" class="back-btn">
+    <i class="fa fa-arrow-left"></i> Back
+  </button>
+</div>
+    <h2>Complaint Form</h2>
+    <form class="complaint-form" action="complaint.php" method="POST">
+      <label>Email:</label>
+      <input type="email" name="email" placeholder="Enter your email" required>
+
+      <label>Issue Type:</label>
+      <select id="issueType" name="issue_type" required>
+        <option value="">-- Select an issue --</option>
+        <option value="Study Material Issue">Study Material Issue</option>
+        <option value="Technical Issue">Technical Issue</option>
+        <option value="Security Issue">Security Issue</option>
+        <option value="Others">Others</option>
+      </select>
+
+      <label>Describe the Issue:</label>
+      <textarea id="description" name="description_text" placeholder="Write your problem here..." rows="5" required></textarea>
+
+      <button type="submit">Submit Complaint</button>
+    </form>
+  </div>
+  
+  </script>
+  <script>
+function goBack() {
+  window.history.back();
+}
+</script>
+</body>
+</html>

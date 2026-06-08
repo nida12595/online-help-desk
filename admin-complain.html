@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Complaint Management</title>
+<style>
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    align-items: center;
+  }
+  .container {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+  }
+  .header {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #ab56cc;
+    font-weight: 700;
+    text-align: center;
+  }
+  .filters {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+  }
+  .filters select,
+  .filters input[type="search"] {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+  .content {
+    flex: 1;
+    display: flex;
+    gap: 20px;
+    overflow: hidden;
+  }
+  .complaint-list {
+    flex: 1;
+    overflow-y: auto;
+    border-radius: 10px;
+    background: #fff;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #eee;
+  }
+  .complaint-item {
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .complaint-item:last-child {
+    border-bottom: none;
+  }
+  .complaint-item:hover {
+    background: #f0e6ff;
+  }
+  .complaint-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  .complaint-meta {
+    font-size: 0.85rem;
+    color: #666;
+  }
+  .complaint-status.new {
+    color: teal;
+  }
+  .complaint-status.in-progress {
+    color: orange;
+  }
+  .complaint-status.resolved {
+    color: green;
+  }
+  .complaint-detail {
+    flex-basis: 45%;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+  }
+  .complaint-detail h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #ab56cc;
+  }
+  .complaint-detail p {
+    margin-bottom: 10px;
+  }
+  .priority.low {
+    color: #28a745;
+  }
+  .priority.medium {
+    color: #ffc107;
+  }
+  .priority.high {
+    color: #dc3545;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">Complaint Management</header>
+
+  <div class="filters">
+    <input type="search" id="searchInput" placeholder="Search complaints..." />
+    
+    <select id="statusFilter" onchange="applyFilters()">
+      <option value="">All Status</option>
+      <option value="new">New</option>
+      <option value="in-progress">In Progress</option>
+      <option value="resolved">Resolved</option>
+    </select>
+    <select id="priorityFilter" onchange="applyFilters()">
+      <option value="">All Priorities</option>
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
+    </select>
+    <button onclick="applyFilters()">Search</button>
+  </div>
+
+  <div class="content">
+    <div class="complaint-list" id="complaintList"></div>
+    <div class="complaint-detail" id="detailPanel">
+      <h3>Complaint Details</h3>
+      <p>Select a complaint to see details here.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const complaintDetails = {
+  1: {
+    title: "Student cannot reset password",
+    description: "Students report issues receiving password reset emails or errors using the reset link.",
+    status: "new",
+    priority: "high",
+    assignedTo: "Technical Support",
+    dateSubmitted: "2025-10-10",
+  },
+  2: {
+    title: "Issue with PDF material",
+    description: "PDF documents on the student portal are corrupted or displaying unreadable text.",
+    status: "in-progress",
+    priority: "medium",
+    assignedTo: "Content Management",
+    dateSubmitted: "2025-10-11",
+  },
+  3: {
+    title: "Problem downloading PDFs",
+    description: "Students experience download failures or very slow downloads for PDFs.",
+    status: "resolved",
+    priority: "medium",
+    assignedTo: "IT Support",
+    dateSubmitted: "2025-10-12",
+  },
+  4: {
+    title: "PDF-related YouTube links broken",
+    description: "Embedded YouTube tutorial links in PDFs are either broken or lead to irrelevant videos.",
+    status: "new",
+    priority: "low",
+    assignedTo: "Multimedia Team",
+    dateSubmitted: "2025-10-13",
+  },
+  5: {
+    title: "Website link issues for students",
+    description: "Links to external resources on the student portal lead to error pages or outdated content.",
+    status: "in-progress",
+    priority: "medium",
+    assignedTo: "Web Team",
+    dateSubmitted: "2025-10-14",
+  },
+};
+
+function createComplaintItem(id, complaint) {
+  return `
+    <div class="complaint-item" onclick="showDetail(${id})">
+      <div class="complaint-title">${complaint.title}</div>
+      <div class="complaint-meta">ID: ${id} | 
+        <span class="complaint-status ${complaint.status}">${capitalize(complaint.status)}</span> | 
+        <span class="priority ${complaint.priority}">${capitalize(complaint.priority)}</span>
+      </div>
+    </div>`;
+}
+
+function capitalize(text) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function renderComplaints(filteredIds) {
+  const listDiv = document.getElementById("complaintList");
+  if (filteredIds.length === 0) {
+    listDiv.innerHTML = "<p>No complaints found.</p>";
+    document.getElementById("detailPanel").innerHTML = '<h3>Complaint Details</h3><p>Select a complaint to see details here.</p>';
+    return;
+  }
+  listDiv.innerHTML = filteredIds
+    .map(id => createComplaintItem(id, complaintDetails[id]))
+    .join('');
+  showDetail(filteredIds[0]);
+}
+
+function applyFilters() {
+  const status = document.getElementById("statusFilter").value;
+  const priority = document.getElementById("priorityFilter").value;
+  const search = document.getElementById("searchInput").value.toLowerCase();
+
+  let filteredIds = Object.keys(complaintDetails).filter(id => {
+    const complaint = complaintDetails[id];
+    const matchesStatus = status ? complaint.status === status : true;
+    const matchesPriority = priority ? complaint.priority === priority : true;
+    const matchesSearch = search
+      ? complaint.title.toLowerCase().includes(search) ||
+        complaint.description.toLowerCase().includes(search)
+      : true;
+    return matchesStatus && matchesPriority && matchesSearch;
+  });
+  renderComplaints(filteredIds);
+}
+
+function showDetail(id) {
+  const d = complaintDetails[id];
+  const panel = document.getElementById('detailPanel');
+  panel.innerHTML = `
+    <h3>${d.title}</h3>
+    <p><strong>Status:</strong> ${capitalize(d.status)}</p>
+    <p><strong>Priority:</strong> ${capitalize(d.priority)}</p>
+    <p><strong>Assigned To:</strong> ${d.assignedTo}</p>
+    <p><strong>Date Submitted:</strong> ${d.dateSubmitted}</p>
+    <p>${d.description}</p>`;
+}
+
+
+window.onload = () => {
+  renderComplaints(Object.keys(complaintDetails));
+};
+
+
+document.getElementById('searchInput').addEventListener('keypress', function(event) {
+  if (event.key === "Enter") {
+    applyFilters();
+  }
+});
+</script>
+</body>
+</html>
